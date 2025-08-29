@@ -1,8 +1,25 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { teamLogos } from "../teamLogos"; // team logos
+import { teamLogos } from "../teamLogos";
+
+// 👇 Utility function to convert API startDate into IST
+function formatMatchTime(timestamp) {
+  if (!timestamp) return "";
+  let date = new Date(Number(timestamp));
+  return date.toLocaleString("en-GB", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Asia/Kolkata", // 👈 Force IST
+    timeZoneName: "short",
+  });
+}
 
 function Home() {
+  const [matchData, setMatchData] = useState([]);
+
+  // 🟢 Tumhara purana static data same naam ke sath
   let data = {
     matchDetails: [
       {
@@ -1607,12 +1624,6 @@ function Home() {
     },
   };
 
-  const [matchData, setMatchData] = useState([]);
-
-  let filterData = data.matchDetails.filter(
-    (singleMatch) => singleMatch.matchDetailsMap
-  );
-
   async function FetchMatchdata() {
     const url = "https://cricbuzz-cricket.p.rapidapi.com/series/v1/9575";
     const options = {
@@ -1625,26 +1636,49 @@ function Home() {
 
     try {
       const response = await fetch(url, options);
+
+      if (!response.ok) {
+        console.warn("⚠️ API Request Failed:", response.status, response.statusText);
+
+        if (response.status === 429) {
+          console.error("🚨 API Quota Exceeded! Please change your API key.");
+        }
+
+        // 👇 fallback to tumhara static data
+        let filterData = data.matchDetails.filter(
+          (singleMatch) => singleMatch.matchDetailsMap
+        );
+        setMatchData(filterData);
+        return;
+      }
+
       const result = await response.json();
-      let filterData = result.matchDetails.filter(
+      console.log("✅ API Response:", result);
+
+      let filterData = result.matchDetails?.filter(
+        (singleMatch) => singleMatch.matchDetailsMap
+      );
+
+      setMatchData(filterData || []);
+    } catch (error) {
+      console.error("❌ API Fetch Error:", error);
+
+      // 👇 fallback to tumhara static data
+      let filterData = data.matchDetails.filter(
         (singleMatch) => singleMatch.matchDetailsMap
       );
       setMatchData(filterData);
-    } catch (error) {
-      console.error(error);
     }
   }
 
   useEffect(() => {
-    // FetchMatchdata();
-    setMatchData(filterData);
+    FetchMatchdata();
   }, []);
 
   return (
     <div className="px-4">
       <h2 className="text-2xl font-bold mb-6">Upcoming & Recent Matches</h2>
 
-      {/* ✅ Grid me ab 2 matches ek row me, gap fix */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
         {matchData?.map(({ matchDetailsMap: { match, key: date } }) =>
           match.map(
@@ -1657,6 +1691,7 @@ function Home() {
                 matchId,
                 matchDesc,
                 matchFormat,
+                startDate,
               },
               matchScore,
             }) => (
@@ -1665,7 +1700,6 @@ function Home() {
                 to={`/matchDetail/${matchId}`}
                 className="bg-gray-900 rounded-xl shadow-lg p-4 hover:scale-105 transition transform duration-300 block"
               >
-                {/* Match Title & Date */}
                 <div className="flex justify-between text-sm text-gray-400 mb-2">
                   <p>
                     {matchFormat} {matchDesc}
@@ -1721,7 +1755,7 @@ function Home() {
                     ? status.split(" won")[0] === team1.teamName
                       ? team1.teamSName + " won " + status.split("won ")[1]
                       : team2.teamSName + " won " + status.split("won ")[1]
-                    : status}
+                    : `Match starts at ${formatMatchTime(startDate)}`}
                 </p>
               </Link>
             )

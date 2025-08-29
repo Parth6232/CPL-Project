@@ -19,7 +19,7 @@ function InPageNavigation({ teams, children }) {
 
   return (
     <div className="w-full">
-      {/* 🔹 Button container updated */}
+      {/*  Button container */}
       <div
         className={
           "bg-blue-800 w-full flex justify-center items-end relative " +

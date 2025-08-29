@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { teamLogos } from "../teamLogos"; 
+import { teamLogos } from "../teamLogos";
 
 function PointsTable() {
-  // Static points table data
+  
   let pointsTableData = {
     pointsTable: [
       {
@@ -744,21 +744,31 @@ function PointsTable() {
     try {
       const response = await fetch(url, options);
       const result = await response.json();
-      setTableData(result.pointsTable?.[0]?.pointsTableInfo || tableData);
+
+      console.log("API Response ===>", result); 
+
+    
+      if (result?.pointsTable?.[0]?.pointsTableInfo) {
+        setTableData(result.pointsTable[0].pointsTableInfo);
+      } else {
+        
+        setTableData(pointsTableData.pointsTable[0].pointsTableInfo);
+      }
     } catch (error) {
       console.error("API fetch error:", error);
+      
+      setTableData(pointsTableData.pointsTable[0].pointsTableInfo);
     }
   }
 
   useEffect(() => {
-    setTableData(pointsTableData.pointsTable[0].pointsTableInfo);
-    // fetchPointsTable();
+    fetchPointsTable();
   }, []);
 
   return (
     <div className="w-full p-3">
       <table className="w-full border-collapse">
-        {/* Table Header */}
+       
         <thead className="bg-gray-900/60 text-gray-200 text-sm sm:text-base">
           <tr className="h-[50px]">
             <th className="text-left pl-2 sm:pl-6 w-[30%]">Team</th>
@@ -771,7 +781,7 @@ function PointsTable() {
           </tr>
         </thead>
 
-        {/* Table Body */}
+       
         <tbody>
           {tableData && tableData.length > 0 ? (
             tableData.map(
@@ -792,7 +802,7 @@ function PointsTable() {
                   key={teamId}
                   className="h-[55px] border-t border-gray-700 hover:bg-gray-800/40 transition"
                 >
-                  {/* Team column with logo */}
+                  
                   <td className="flex items-center gap-3 pl-2 sm:pl-6 py-2">
                     <span className="text-gray-400 w-4">{i + 1}</span>
                     <img
@@ -803,7 +813,6 @@ function PointsTable() {
                     <span className="font-semibold text-gray-100">{teamName}</span>
                   </td>
 
-                  {/* Stats */}
                   <td className="text-center">{matchesPlayed}</td>
                   <td className="text-center text-green-400">
                     {matchesWon > 0 ? matchesWon : 0}
@@ -812,29 +821,30 @@ function PointsTable() {
                   <td className="text-center">{nrr}</td>
                   <td className="text-center font-bold text-yellow-400">{points}</td>
 
-                  {/* Last 5 Matches */}
+                  
                   <td className="flex justify-center gap-1">
-                    {form
-                      .slice()
-                      .reverse()
-                      .map((data, index) =>
-                        data === "W" ? (
-                          <i
-                            key={index}
-                            className="fi fi-ss-check-circle text-green-500 text-sm"
-                          ></i>
-                        ) : data === "L" ? (
-                          <i
-                            key={index}
-                            className="fi fi-sr-cross-circle text-red-500 text-sm"
-                          ></i>
-                        ) : (
-                          <i
-                            key={index}
-                            className="fi fi-sr-minus-circle text-gray-500 text-sm"
-                          ></i>
-                        )
-                      )}
+                    {form &&
+                      form
+                        .slice()
+                        .reverse()
+                        .map((data, index) =>
+                          data === "W" ? (
+                            <i
+                              key={index}
+                              className="fi fi-ss-check-circle text-green-500 text-sm"
+                            ></i>
+                          ) : data === "L" ? (
+                            <i
+                              key={index}
+                              className="fi fi-sr-cross-circle text-red-500 text-sm"
+                            ></i>
+                          ) : (
+                            <i
+                              key={index}
+                              className="fi fi-sr-minus-circle text-gray-500 text-sm"
+                            ></i>
+                          )
+                        )}
                   </td>
                 </tr>
               )

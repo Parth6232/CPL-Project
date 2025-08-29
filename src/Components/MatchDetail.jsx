@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import InPageNavigation from "./inPageNavigation";
+import InPageNavigation from "./InPageNavigation";
+
 
 function MatchDetail() {
   let { id } = useParams();
 
+  
   let fixedData = {
     matchInfo: {
       matchId: 116615,
@@ -749,7 +751,9 @@ function MatchDetail() {
     ],
   };
 
-  const [data, setData] = useState([]);
+
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   async function FetchMatchDetail() {
     const url = `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${id}`;
@@ -764,16 +768,21 @@ function MatchDetail() {
     try {
       const response = await fetch(url, options);
       const result = await response.json();
-      console.log(result);
+      console.log("API Result:", result);
       setData(result);
     } catch (error) {
-      console.error(error);
+      console.error("API Error:", error);
+    } finally {
+      setLoading(false);
     }
   }
 
   useEffect(() => {
-    // FetchMatchDetail();
+    FetchMatchDetail();
   }, []);
+
+  
+  const matchInfo = data?.matchInfo || fixedData.matchInfo;
 
   return (
     <div className="w-full p-4">
@@ -781,42 +790,44 @@ function MatchDetail() {
         Match Detail
       </h1>
 
-     <InPageNavigation
-  teams={[
-    fixedData.matchInfo.team1.shortName,
-    fixedData.matchInfo.team2.shortName,
-  ]}
->
-  {/* 🔹 Team 1 Players */}
-  <div className="flex flex-col items-center space-y-4 w-full">
-    {fixedData.matchInfo.team1.playerDetails.map((data, i) => (
-      <div
-        key={i}
-        className="w-full max-w-2xl bg-gray-900/70 px-5 py-4 rounded-lg border border-gray-700 shadow-md hover:bg-gray-800/80 transition"
-      >
-        <h2 className="text-lg font-semibold text-gray-100">
-          {data.fullName}
-        </h2>
-        <p className="text-gray-400 text-sm">{data.role}</p>
-      </div>
-    ))}
-  </div>
+      {/* Loading UI */}
+      {loading ? (
+        <p className="text-center text-gray-400">Loading match details...</p>
+      ) : (
+        <InPageNavigation
+          teams={[matchInfo.team1.shortName, matchInfo.team2.shortName]}
+        >
+          {/* 🔹 Team 1 Players */}
+          <div className="flex flex-col items-center space-y-4 w-full">
+            {matchInfo.team1.playerDetails.map((player, i) => (
+              <div
+                key={i}
+                className="w-full max-w-2xl bg-gray-900/70 px-5 py-4 rounded-lg border border-gray-700 shadow-md hover:bg-gray-800/80 transition"
+              >
+                <h2 className="text-lg font-semibold text-gray-100">
+                  {player.fullName}
+                </h2>
+                <p className="text-gray-400 text-sm">{player.role}</p>
+              </div>
+            ))}
+          </div>
 
-  {/* 🔹 Team 2 Players */}
-  <div className="flex flex-col items-center space-y-4 w-full">
-    {fixedData.matchInfo.team2.playerDetails.map((data, i) => (
-      <div
-        key={i}
-        className="w-full max-w-2xl bg-gray-900/70 px-5 py-4 rounded-lg border border-gray-700 shadow-md hover:bg-gray-800/80 transition"
-      >
-        <h2 className="text-lg font-semibold text-gray-100">
-          {data.fullName}
-        </h2>
-        <p className="text-gray-400 text-sm">{data.role}</p>
-      </div>
-    ))}
-  </div>
-</InPageNavigation>
+          {/* 🔹 Team 2 Players */}
+          <div className="flex flex-col items-center space-y-4 w-full">
+            {matchInfo.team2.playerDetails.map((player, i) => (
+              <div
+                key={i}
+                className="w-full max-w-2xl bg-gray-900/70 px-5 py-4 rounded-lg border border-gray-700 shadow-md hover:bg-gray-800/80 transition"
+              >
+                <h2 className="text-lg font-semibold text-gray-100">
+                  {player.fullName}
+                </h2>
+                <p className="text-gray-400 text-sm">{player.role}</p>
+              </div>
+            ))}
+          </div>
+        </InPageNavigation>
+      )}
     </div>
   );
 }
