@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { teamLogos } from "../teamLogos"; // ✅ logos mapping import
+import { teamLogos } from "../teamLogos"; 
 
 function PointsTable() {
   // Static points table data
@@ -736,7 +736,7 @@ function PointsTable() {
     const options = {
       method: "GET",
       headers: {
-        "x-rapidapi-key": "ac73a44d96mshc3fc97b091e8259p13a118jsnbf7eeef0fc1f",
+        "x-rapidapi-key": import.meta.env.VITE_API_KEY,
         "x-rapidapi-host": "cricbuzz-cricket.p.rapidapi.com",
       },
     };
@@ -751,8 +751,8 @@ function PointsTable() {
   }
 
   useEffect(() => {
-    // setTableData(pointsTableData.pointsTable[0].pointsTableInfo);
-    fetchPointsTable();
+    setTableData(pointsTableData.pointsTable[0].pointsTableInfo);
+    // fetchPointsTable();
   }, []);
 
   return (
