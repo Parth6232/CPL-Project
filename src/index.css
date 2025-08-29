@@ -1,0 +1,39 @@
+@import "tailwindcss"; /* 🔹 Tailwind v4 syntax */
+@import "@flaticon/flaticon-uicons/css/all/all.css";
+
+/* Global styles for dark theme & font */
+body {
+  @apply bg-gray-950 text-white font-sans;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1f2937; /* gray-800 */
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4b5563; /* gray-600 */
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7280; /* gray-500 */
+}
+
+/* Links transition */
+a {
+  @apply transition-colors duration-200;
+}
+
+/* Headings consistency */
+h1, h2, h3, h4 {
+  @apply font-bold tracking-wide;
+}
